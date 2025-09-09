@@ -14,7 +14,7 @@ function App() {
     console.log("🔄 Initializing socket connection...");
     
     // Create socket connection
-    socketRef.current = io("http://localhost:3000", {
+    socketRef.current = io("https://websocket-backend-ws5t.onrender.com", {
       transports: ['websocket', 'polling'], // Fallback transport methods
       timeout: 5000,
     });
