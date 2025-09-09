@@ -7,9 +7,9 @@ const io = new Server(httpServer, {
     origin: ["http://localhost:5173", "http://localhost:3000"], // Add both Vite and Create React App ports
     methods: ["GET", "POST"],
     credentials: true
-    
+  
   },
-});
+})
 
 let messages = [];
 let userCount = 0;
@@ -19,7 +19,7 @@ io.on("connection", (socket) => {
   console.log(`✅ User connected: ${socket.id} (Total users: ${userCount})`);
 
   // Send existing messages to new user
-  socket.emit("chatMessages", messages);
+  socket.emit("chatMessages", messages)
   
   // Broadcast user count to all clients
   io.emit("userCount", userCount);
