@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
+import "./component/Chat"
 
 function App() {
   const [message, setMessage] = useState("");
@@ -13,10 +14,12 @@ function App() {
   useEffect(() => {
     console.log("🔄 Initializing socket connection...");
     
-    // Create socket connection
-    socketRef.current = io("https://websocket-backend-ws5t.onrender.com", {
-      transports: ['websocket', 'polling'], // Fallback transport methods
-      timeout: 5000,
+    // Create socket connection - using environment variable or fallback
+    const socketURL = import.meta.env.VITE_SOCKET_URL || "https://websocket-backend-ws5t.onrender.com";
+    
+    socketRef.current = io(socketURL, {
+      transports: ['websocket', 'polling'],
+      timeout: 10000, // Increased timeout for Render cold starts
     });
 
     // Connection successful
@@ -29,7 +32,7 @@ function App() {
     // Connection failed
     socketRef.current.on("connect_error", (error) => {
       console.error("❌ Connection error:", error);
-      setConnectionStatus("Connection failed - Check if server is running");
+      setConnectionStatus("Connection failed - Server may be starting up");
       setIsConnected(false);
     });
 
@@ -40,7 +43,6 @@ function App() {
       setIsConnected(false);
       
       if (reason === "io server disconnect") {
-        // Server disconnected the socket, reconnect manually
         socketRef.current.connect();
       }
     });
@@ -51,7 +53,6 @@ function App() {
       console.log("📊 Total messages:", allMessages.length);
       setMessages(allMessages);
       
-      // Auto-scroll to bottom after messages update
       setTimeout(() => {
         scrollToBottom();
       }, 100);
@@ -63,22 +64,20 @@ function App() {
       setUserCount(count);
     });
 
-    // Cleanup function
     return () => {
       if (socketRef.current) {
         console.log("🧹 Cleaning up socket connection...");
-        socketRef.current.off(); // Remove all listeners
+        socketRef.current.off();
         socketRef.current.disconnect();
       }
     };
-  }, []); // Empty dependency array to run only once
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const sendMessage = () => {
-    // Validate message
     if (!message.trim()) {
       console.log("⚠️ Empty message, not sending");
       return;
@@ -96,11 +95,7 @@ function App() {
     }
 
     console.log("🚀 Sending message:", message);
-    
-    // Emit message to server
     socketRef.current.emit("chatMessage", message.trim());
-    
-    // Clear input
     setMessage("");
   };
 
@@ -201,7 +196,7 @@ function App() {
             borderRadius: '8px',
             border: '1px solid #f5c6cb'
           }}>
-            ⚠️ Not connected to server. Make sure the server is running on port 3000.
+            ⚠️ Not connected to server. Server may be starting up (Render cold start).
           </div>
         )}
 
@@ -284,8 +279,10 @@ function App() {
             borderRadius: '25px',
             fontSize: '16px',
             outline: 'none',
-            backgroundColor: isConnected ? 'white' : '#f8f9fa',
-            color: '#333'
+            backgroundColor: isConnected ? '#ffffff' : '#f8f9fa',
+            color: '#333333 !important', // Force dark text
+            WebkitTextFillColor: '#333333', // Override webkit autofill
+            caretColor: '#333333' // Ensure cursor is visible
           }}
         />
         <button 
@@ -308,24 +305,23 @@ function App() {
       </div>
 
       {/* Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{ 
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: '#ffffff',
-          borderRadius: '8px',
-          fontSize: '12px',
-          color: '#666',
-          border: '1px solid #e0e0e0'
-        }}>
-          <strong>Debug Info:</strong><br/>
-          Connected: {isConnected ? 'Yes' : 'No'}<br/>
-          Socket ID: {socketRef.current?.id || 'None'}<br/>
-          Messages Count: {messages.length}<br/>
-          Current Message Length: {message.length}/500<br/>
-          Online Users: {userCount}
-        </div>
-      )}
+      <div style={{ 
+        marginTop: '20px',
+        padding: '15px',
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        fontSize: '12px',
+        color: '#666',
+        border: '1px solid #e0e0e0'
+      }}>
+        <strong>Debug Info:</strong><br/>
+        Connected: {isConnected ? 'Yes' : 'No'}<br/>
+        Socket ID: {socketRef.current?.id || 'None'}<br/>
+        Messages Count: {messages.length}<br/>
+        Current Message Length: {message.length}/500<br/>
+        Online Users: {userCount}<br/>
+        Server: {import.meta.env.VITE_SOCKET_URL || "https://websocket-backend-ws5t.onrender.com"}
+      </div>
     </div>
   );
 }

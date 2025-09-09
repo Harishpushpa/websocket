@@ -1,0 +1,36 @@
+/* Override global styles for chat input */
+input[type="text"] {
+  color: #333333 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #333333 !important;
+  caret-color: #333333 !important;
+}
+
+input[type="text"]:disabled {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  -webkit-text-fill-color: #6c757d !important;
+}
+
+/* Placeholder styling */
+input[type="text"]::placeholder {
+  color: #999999 !important;
+  opacity: 1 !important;
+}
+
+input[type="text"]:disabled::placeholder {
+  color: #cccccc !important;
+}
+
+/* Autofill override for Chrome */
+input[type="text"]:-webkit-autofill {
+  -webkit-text-fill-color: #333333 !important;
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Focus states */
+input[type="text"]:focus {
+  outline: 2px solid #007bff !important;
+  outline-offset: 2px;
+}
