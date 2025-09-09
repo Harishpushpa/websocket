@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
-import "./component/Chat"
+// Remove any other imports that reference Chat or non-existent components
 
 function App() {
   const [message, setMessage] = useState("");
@@ -14,12 +14,10 @@ function App() {
   useEffect(() => {
     console.log("🔄 Initializing socket connection...");
     
-    // Create socket connection - using environment variable or fallback
-    const socketURL = import.meta.env.VITE_SOCKET_URL || "https://websocket-backend-ws5t.onrender.com";
-    
-    socketRef.current = io(socketURL, {
+    // Create socket connection
+    socketRef.current = io("https://websocket-backend-ws5t.onrender.com", {
       transports: ['websocket', 'polling'],
-      timeout: 10000, // Increased timeout for Render cold starts
+      timeout: 10000,
     });
 
     // Connection successful
@@ -280,9 +278,8 @@ function App() {
             fontSize: '16px',
             outline: 'none',
             backgroundColor: isConnected ? '#ffffff' : '#f8f9fa',
-            color: '#333333 !important', // Force dark text
-            WebkitTextFillColor: '#333333', // Override webkit autofill
-            caretColor: '#333333' // Ensure cursor is visible
+            color: '#333333',
+            WebkitTextFillColor: '#333333'
           }}
         />
         <button 
@@ -319,8 +316,7 @@ function App() {
         Socket ID: {socketRef.current?.id || 'None'}<br/>
         Messages Count: {messages.length}<br/>
         Current Message Length: {message.length}/500<br/>
-        Online Users: {userCount}<br/>
-        Server: {import.meta.env.VITE_SOCKET_URL || "https://websocket-backend-ws5t.onrender.com"}
+        Online Users: {userCount}
       </div>
     </div>
   );
