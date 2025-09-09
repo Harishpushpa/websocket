@@ -7,6 +7,7 @@ const io = new Server(httpServer, {
     origin: ["http://localhost:5173", "http://localhost:3000"], // Add both Vite and Create React App ports
     methods: ["GET", "POST"],
     credentials: true
+    
   },
 });
 
