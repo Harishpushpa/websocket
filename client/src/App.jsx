@@ -15,7 +15,7 @@ function App() {
     console.log("🔄 Initializing socket connection...");
     
     // Create socket connection
-    socketRef.current = io("https://websocket-backend-ws5t.onrender.com", {
+    socketRef.current = io("https://websocket-backend-1-pwkg.onrender.com", {
       transports: ['websocket', 'polling'],
       timeout: 10000,
     });
