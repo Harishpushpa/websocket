@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
-// Remove any other imports that reference Chat or non-existent components
 
 function App() {
   const [message, setMessage] = useState("");
@@ -13,50 +12,45 @@ function App() {
 
   useEffect(() => {
     console.log("🔄 Initializing socket connection...");
-    
-    // Create socket connection
+
     socketRef.current = io("https://websocket-backend-1-pwkg.onrender.com", {
       transports: ['websocket', 'polling'],
       timeout: 10000,
     });
 
-    // Connection successful
     socketRef.current.on("connect", () => {
       console.log("✅ Connected with ID:", socketRef.current.id);
       setConnectionStatus("Connected");
       setIsConnected(true);
     });
 
-    // Connection failed
     socketRef.current.on("connect_error", (error) => {
       console.error("❌ Connection error:", error);
       setConnectionStatus("Connection failed - Server may be starting up");
       setIsConnected(false);
     });
 
-    // Disconnection
     socketRef.current.on("disconnect", (reason) => {
       console.log("🔌 Disconnected:", reason);
       setConnectionStatus("Disconnected");
       setIsConnected(false);
-      
+
       if (reason === "io server disconnect") {
         socketRef.current.connect();
       }
     });
 
-    // Receive all chat messages
+    // Receive all chat messages (now sourced from MongoDB on the server, decrypted)
     socketRef.current.on("chatMessages", (allMessages) => {
       console.log("📥 Received messages:", allMessages);
       console.log("📊 Total messages:", allMessages.length);
       setMessages(allMessages);
-      
+
       setTimeout(() => {
         scrollToBottom();
       }, 100);
     });
 
-    // Receive user count updates
     socketRef.current.on("userCount", (count) => {
       console.log("👥 User count:", count);
       setUserCount(count);
@@ -113,18 +107,18 @@ function App() {
   };
 
   return (
-    <div style={{ 
-      maxWidth: '800px', 
-      margin: '20px auto', 
+    <div style={{
+      maxWidth: '800px',
+      margin: '20px auto',
       padding: '20px',
       fontFamily: 'Arial, sans-serif',
       backgroundColor: '#f5f5f5',
       minHeight: '100vh'
     }}>
       {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '20px',
         padding: '15px',
@@ -134,7 +128,7 @@ function App() {
       }}>
         <h1 style={{ margin: 0, color: '#333' }}>💬 Real-time Chat</h1>
         <div style={{ textAlign: 'right', fontSize: '14px' }}>
-          <div style={{ 
+          <div style={{
             color: isConnected ? '#28a745' : '#dc3545',
             fontWeight: 'bold',
             marginBottom: '5px'
@@ -152,7 +146,7 @@ function App() {
             </>
           )}
           {!isConnected && (
-            <button 
+            <button
               onClick={reconnect}
               style={{
                 fontSize: '12px',
@@ -199,8 +193,8 @@ function App() {
         )}
 
         {messages.length === 0 ? (
-          <div style={{ 
-            textAlign: 'center', 
+          <div style={{
+            textAlign: 'center',
             color: '#666',
             marginTop: '100px'
           }}>
@@ -211,7 +205,7 @@ function App() {
           messages.map((msg, index) => {
             const isOwnMessage = msg.id === socketRef.current?.id;
             return (
-              <div 
+              <div
                 key={`${msg.id}-${index}`}
                 style={{
                   marginBottom: '15px',
@@ -227,8 +221,8 @@ function App() {
                   borderRadius: '18px',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                 }}>
-                  <div style={{ 
-                    fontSize: '11px', 
+                  <div style={{
+                    fontSize: '11px',
                     opacity: 0.7,
                     marginBottom: '4px',
                     fontWeight: 'bold'
@@ -237,8 +231,8 @@ function App() {
                   </div>
                   <div style={{ wordBreak: 'break-word' }}>{msg.text}</div>
                   {msg.timestamp && (
-                    <div style={{ 
-                      fontSize: '10px', 
+                    <div style={{
+                      fontSize: '10px',
                       opacity: 0.6,
                       marginTop: '4px'
                     }}>
@@ -254,8 +248,8 @@ function App() {
       </div>
 
       {/* Message Input */}
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         gap: '10px',
         padding: '15px',
         backgroundColor: '#ffffff',
@@ -282,7 +276,7 @@ function App() {
             WebkitTextFillColor: '#333333'
           }}
         />
-        <button 
+        <button
           onClick={sendMessage}
           disabled={!isConnected || !message.trim()}
           style={{
@@ -302,7 +296,7 @@ function App() {
       </div>
 
       {/* Debug Info */}
-      <div style={{ 
+      <div style={{
         marginTop: '20px',
         padding: '15px',
         backgroundColor: '#ffffff',
