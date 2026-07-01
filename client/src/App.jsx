@@ -13,10 +13,10 @@ function App() {
   useEffect(() => {
     console.log("🔄 Initializing socket connection...");
 
-    socketRef.current = io("https://websocket-backend-1-pwkg.onrender.com", {
-      transports: ['websocket', 'polling'],
-      timeout: 10000,
-    });
+   socketRef.current = io("https://websocket-backend-ws5t.onrender.com", {
+  transports: ['websocket', 'polling'],
+  timeout: 10000,
+});
 
     socketRef.current.on("connect", () => {
       console.log("✅ Connected with ID:", socketRef.current.id);
